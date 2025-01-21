@@ -1,4 +1,4 @@
 alembic
 sqlalchemy
 psycopg2-binary
-pybaseball
+git+https://github.com/jldbc/pybaseball@aa093f9#egg=pybaseball

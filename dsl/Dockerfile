@@ -7,6 +7,11 @@ WORKDIR /app
 RUN apt-get update && \
     apt-get install -y libpq-dev gcc
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    git \
+    && apt-get clean \
+    && rm -rf /var/lib/apt/lists/*
+
 # Copy the requirements file into the container
 COPY requirements.txt .
 
