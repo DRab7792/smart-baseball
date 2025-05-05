@@ -3,8 +3,16 @@ from pybaseball.utils import get_text_file
 from sqlalchemy import text
 import pandas as pd
 from io import StringIO
+from .franchises import get_franchise_dict
 
 team_columns = ['teamID', 'lgID', 'city', 'name', 'start_year', 'end_year']
+
+def truncate_table(db):
+    # Truncate teams table with cascade to remove all data and reset id sequence
+    db.execute(text("TRUNCATE TABLE teams CASCADE"))
+    db.execute(text("ALTER SEQUENCE teams_team_id_seq RESTART WITH 1"))
+    db.commit()
+
 
 def rs_teams():
     url = "https://www.retrosheet.org/TEAMABR.TXT"
@@ -14,29 +22,14 @@ def rs_teams():
     return data
 
 def seed_teams(db, start_year=2000, end_year=2021):
+    """Seed teams for the given year range."""
+    truncate_table(db)
+    franchise_dict = get_franchise_dict(db)
+    
     for year in range(start_year, end_year + 1):
+        print(f"*******YEAR: {year}")
         teams = team_ids(year)
-        print ("*******YEAR: " + str(year))
-
-        # Insert franchises
-        franchises = teams['franchID'].unique()
-        print (franchises)
         
-        values = [{"name": franchise} for franchise in franchises]
-        db.execute(
-            text("INSERT INTO franchises (name) VALUES (:name) ON CONFLICT (name) DO NOTHING"),
-            values
-        )
-        
-        db.commit()
-
-        # Select franchise IDs 
-        franchise_ids = db.execute(text("SELECT id, name FROM franchises")).fetchall()
-        franchise_dict = {}
-        for (id, name) in franchise_ids:
-            franchise_dict[name] = id
-        
-
         # Get all data needed for teams table
         rs_team_data = rs_teams()
         rs_team_data = rs_team_data.drop(columns=['lgID'])
@@ -51,7 +44,7 @@ def seed_teams(db, start_year=2000, end_year=2021):
             values.append({
                 "league": row['lgID'],
                 "name": row['name'],
-                "franchise_id": franchise_dict[row['franchID']],
+                "franchise_id": franchise_dict.get(row['franchID'], 0),
                 "fg_id": row['teamIDfg'],
                 "br_id": row['teamIDBR'],
                 "rs_id": row['teamIDretro'],
@@ -59,11 +52,11 @@ def seed_teams(db, start_year=2000, end_year=2021):
                 "start_year": row['start_year'],
                 "end_year": end_year,
             })
+            
         db.execute(
             text("INSERT INTO teams (league, name, franchise_id, fg_id, br_id, rs_id, location, start_year, end_year) VALUES (:league, :name, :franchise_id, :fg_id, :br_id, :rs_id, :location, :start_year, :end_year) ON CONFLICT (rs_id) DO NOTHING"),
             values
         )
-        
         db.commit()
 
 def seed_franchise_years(db):
@@ -80,4 +73,4 @@ def seed_franchise_years(db):
         GROUP BY franchises.name
     """
     franchise_years = db.execute(text(sql)).fetchall()
-    print (franchise_years)
+    print(franchise_years)

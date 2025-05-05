@@ -1,6 +1,8 @@
 from pybaseball import team_ids, park_codes
+from datasources.lahman import *
 
-def stadiums():
-    parks = park_codes()
-    print (parks)
-    return parks
+def seed_stadiums():
+    # parks = park_codes()
+    ballparks = teams_franchises()
+    print (ballparks)
+    return ballparks

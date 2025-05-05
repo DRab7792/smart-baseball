@@ -1,5 +1,7 @@
 import os
-from seeds.teams import seed_teams, seed_franchise_years
+from seeds.teams import seed_teams
+from seeds.franchises import seed_franchises, seed_franchise_years
+from seeds.stadiums import seed_stadiums
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import logging
@@ -22,11 +24,17 @@ if __name__ == "__main__":
     logging.basicConfig()
     logging.getLogger('sqlalchemy.engine').setLevel(logging.INFO)
 
-    # seed_teams(db, 1900)
+    # First seed franchises
+    seed_franchises(db)
+    
+    # Then seed teams
+    seed_teams(db, 1900)
+    
+    # Finally update franchise years
     seed_franchise_years(db)
-    # parks = park_codes()
+    
+    # parks = seed_stadiums()
     # print(parks)
-
 
     db.commit()
     db.close()

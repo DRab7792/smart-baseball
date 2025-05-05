@@ -18,5 +18,6 @@ services:
     env_file: .env
     volumes:
       - ./dsl:/app
+      - ./.pybaseball:/app/.pybaseball/cache
     working_dir: /app
 
