@@ -33,7 +33,7 @@ def upgrade() -> None:
     """
     op.create_table(
         'teams',
-        sa.Column('team_id', sa.Integer, primary_key=True, autoincrement=True),
+        sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('year', sa.Integer, unique=True),
         sa.Column('abbreviation', sa.String(length=10)),
         sa.Column('league', sa.String(length=50)),

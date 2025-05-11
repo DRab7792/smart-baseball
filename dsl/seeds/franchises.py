@@ -8,9 +8,10 @@ def truncate_table(db):
     db.execute(text("ALTER SEQUENCE franchise_id_seq RESTART WITH 1"))
     db.commit()
 
-def seed_franchises(db):
+def seed_franchises(db, truncate=True):
     """Seed franchises from Lahman and Retrosheet data."""
-    truncate_table(db)
+    if truncate:
+        truncate_table(db)
 
     # Get all unique franchise IDs from Retrosheet
     teams = team_ids(2021)  # Using 2021 as a reference year to get all franchises

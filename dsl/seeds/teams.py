@@ -21,9 +21,10 @@ def rs_teams():
     data.columns = team_columns
     return data
 
-def seed_teams(db, start_year=2000, end_year=2021):
+def seed_teams(db, start_year=2000, end_year=2021, truncate=True):
     """Seed teams for the given year range."""
-    truncate_table(db)
+    if truncate:
+        truncate_table(db)
     franchise_dict = get_franchise_dict(db)
     
     for year in range(start_year, end_year + 1):
