@@ -1,0 +1,20 @@
+{
+  "name": "smart-baseball",
+  "description": "A project for analyzing baseball statistics using the Lahman dataset",
+  "setup": {
+    "script": "./setup.sh"
+  },
+  "run": {
+    "command": "docker-compose up -d"
+  },
+  "dependencies": {
+    "system": ["docker", "docker-compose", "wget", "p7zip-full"],
+    "python": {
+      "file": "./dsl/requirements.txt"
+    }
+  },
+  "ports": [5432],
+  "environment": {
+    "template": ".env"
+  }
+}
